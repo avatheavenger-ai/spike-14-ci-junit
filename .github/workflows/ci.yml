@@ -1,0 +1,26 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  remote-set:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Node version
+        run: node --version
+      - name: Tests (remote set) with a JUnit report
+        run: |
+          mkdir -p reports
+          node --test --test-reporter=spec --test-reporter-destination=stdout \
+                      --test-reporter=junit --test-reporter-destination=reports/junit.xml
+      - name: Upload the JUnit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-remote-set
+          path: reports/junit.xml
+          if-no-files-found: error
